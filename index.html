@@ -46,6 +46,92 @@
     </div>
 
     <div class="description">
+       Description
+The Monte Carlo Path Visualiser above illustrates sample asset prices generated from Black-Scholes and Heston processes using the Euler-Maruyama numerical method.
+
+The Black-Scholes model (see [1], [2]) for an asset price 
+ is given by the one-factor stochastic process, in this case geometric Brownian motion, described by the stochastic differential equation (SDE)
+ 
+where 
+ is the change in the asset price with respect to time, 
+ is the expected rate of return, 
+ is the volatility of the asset price and 
+ is a standard Wiener process in the real-world, or physical, measure 
+ of the underlying. Heston's model [3], on the other hand, is a two-factor model where both the asset's price and variance are modelled using correlated stochastic processes given by the SDEs
+ 
+Here, the instantaneous variance in the asset price is modelled using a mean-reverting square-root process. The parameter 
+ is the mean-reversion speed, 
+ is the mean-reversion level, 
+ is now the volatility of volatility (or vol of vol) and 
+ is the correlation between the asset price and variance processes. Note that both Wiener processes are taken in their respective real-world measures. In general, these measures are not used for pricing financial derivatives, instead a transformation to a risk-neutral measure is made. This is not done here for this visualisation, but it is interesting to note that the functional form of the transformation turns out to be the same, and therefore the behaviour in the above visualisation carries over.
+
+A straightforward application of the Euler-Maruyama method (see [4]) to solve SDE (
+) is given by
+for a given initial asset price 
+, where 
+ are a series of independent and identically distributed (i.i.d.) random samples taken from the normal distribution 
+. In the case of Heston's model (
+),
+ 
+where the initial variance 
+ is now also required. Two sets of samples are needed for the simulation, since there are two stochastic processes, these are denoted using the 
+ and 
+ subscripts.
+
+Using Euler-Maruyama to simulate the asset price process for 
+ introduces an unneccesary discretisation bias. In this case, the Euler-Maruyama approximation has higher order error terms which do not vanish for the geometric Brownian process 
+, however, they do in fact vanish for an ordinary Brownian process. If we let 
+ then, by Ito's lemma, we have
+ 
+ 
+ 
+ 
+ 
+ 
+Suppose that 
+ is a general stochastic differential equation 
+ with
+ 
+where 
+ denotes a standard Wiener process, then
+ 
+ 
+ 
+where the last expression is obtained by noting the stochastic calculus identities 
+, 
+ and 
+. Written another way,
+where
+ 
+We recognise this is the same as the Geometric Brownian motion process (
+) above provided that
+ 
+ 
+If we substitute these values into (
+) then
+ 
+Applying Euler-Maruyama to 
+ rather than to 
+ leads to a more accurate solution since the higher order terms then completely vanish in the error truncation. To switch between the 
+ or 
+ methods in the app, see the check box above labelled "Use log spot process". It is also possible to derive a higher-order approximation to the SDE instead, see Milstein's method in [4]. This approximation can be more accurate and may converge to a solution faster for some models than Euler-Maruyama, but using it to generate samples for the Heston model and other multifactor models requires additional care (c.f. Levy areas).
+
+Finally, note that in the discrete approximation, it is possible for the variance process in Heston to go below zero. Some methods for handling the cases of negative variance are detailed in [5] and implemented above, selectable from the drop-down "Variance correction scheme". The "Accept-Reject" scheme rejects a path if it generates a negative variance and replaces this with an entirely new path.
+
+The simulation goes between a minimum of 10 and a maximum of 250 paths depending on how many time steps and maximum number of paths are selected. With more time steps, the simulation inevitably takes longer to render, so reducing the number of paths seems like a reasonable trade-off for visualisation. The input parameters for the two models can be varied, and the plot will update accordingly to show the possible resulting asset price paths. A histogram is included in the right-hand side of the plot to highlight the distribution of the asset prices at the terminus point 
+.
+
+References
+
+Fischer Black and Myron Scholes. The pricing of options and corporate liabilities. Journal of Political Economy, 81(3):637-654, 1973.
+
+John C. Hull. Options, Futures, and Other Derivatives. Pearson Prentice Hall, Seventh Edition, 2009.
+
+Steven L. Heston. A closed-form solution for options with stochastic volatility with applications to bond and currency options. The Review of Financial Studies, 6(2):327-343, 1993.
+
+Paul Glasserman. Monte Carlo Methods in Financial Engineering. Springer, 2004.
+
+Roger Lord, Remmert Koekkoek and Dick Van Dijk. A comparison of biased simulation schemes for stochastic volatility models. Quantitative Finance,10(2):177-194, 2010.
         <!-- Your provided description text goes here -->
         <!-- [Include all the description text you provided] -->
     </div>
