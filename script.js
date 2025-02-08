@@ -1,89 +1,84 @@
-let chart = null;
+function runSimulation() {
+    // Get input values
+    const S0 = parseFloat(document.getElementById('S0').value);
+    const mu = parseFloat(document.getElementById('mu').value);
+    const sigma = parseFloat(document.getElementById('sigma').value);
+    const timeSteps = parseInt(document.getElementById('timeSteps').value);
+    const numPaths = parseInt(document.getElementById('numPaths').value);
+    const useLogProcess = document.getElementById('logProcess').checked;
 
-document.getElementById('simulate-btn').addEventListener('click', simulatePaths);
-document.querySelectorAll('.model-btn').forEach(btn => {
-    btn.addEventListener('click', () => setModel(btn.dataset.model));
-});
-
-function setModel(model) {
-    document.querySelectorAll('.model-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelector(`[data-model="${model}"]`).classList.add('active');
-    // Add model-specific logic here
-}
-
-function simulatePaths() {
-    const config = {
-        S0: parseFloat(document.getElementById('S0').value),
-        mu: parseFloat(document.getElementById('mu').value),
-        sigma: parseFloat(document.getElementById('sigma').value),
-        steps: parseInt(document.getElementById('steps').value),
-        maxPaths: parseInt(document.getElementById('max-paths').value),
-        useLog: document.getElementById('log-process').checked
-    };
-
-    const paths = generatePaths(config);
-    visualizePaths(paths, config);
-}
-
-function generatePaths(config) {
-    const paths = [];
-    const dt = 1 / config.steps;
+    // Generate paths
+    const paths = generatePaths(S0, mu, sigma, timeSteps, numPaths, useLogProcess);
     
-    for(let i = 0; i < config.maxPaths; i++) {
-        const path = [config.S0];
-        let S = config.S0;
+    // Create time array
+    const time = Array.from({length: timeSteps}, (_, i) => i / timeSteps);
+    
+    // Plot paths
+    plotPaths(time, paths);
+    
+    // Plot histogram
+    plotHistogram(paths);
+}
+
+function generatePaths(S0, mu, sigma, timeSteps, numPaths, useLogProcess) {
+    const dt = 1 / timeSteps;
+    const paths = [];
+    
+    for(let i = 0; i < numPaths; i++) {
+        const path = [S0];
+        let logS = Math.log(S0);
         
-        for(let j = 1; j < config.steps; j++) {
+        for(let j = 1; j < timeSteps; j++) {
             const dW = Math.sqrt(dt) * randn_bm();
-            if(config.useLog) {
-                const dLogS = (config.mu - 0.5 * config.sigma**2) * dt + config.sigma * dW;
-                S = S * Math.exp(dLogS);
+            if(useLogProcess) {
+                logS += (mu - 0.5 * sigma**2) * dt + sigma * dW;
+                path.push(Math.exp(logS));
             } else {
-                const dS = config.mu * S * dt + config.sigma * S * dW;
-                S += dS;
+                path.push(path[j-1] * (1 + mu * dt + sigma * dW));
             }
-            path.push(S);
         }
         paths.push(path);
     }
     return paths;
 }
 
-function visualizePaths(paths, config) {
-    const ctx = document.getElementById('pathChart').getContext('2d');
-    
-    if(chart) chart.destroy();
+function plotPaths(time, paths) {
+    const traces = paths.map((path, i) => ({
+        x: time,
+        y: path,
+        type: 'scatter',
+        mode: 'lines',
+        name: `Path ${i+1}`,
+        line: {width: 1}
+    }));
 
-    chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: Array.from({length: config.steps}, (_, i) => i),
-            datasets: paths.slice(0, 50).map((path, i) => ({
-                label: `Path ${i+1}`,
-                data: path,
-                borderColor: `rgba(33, 150, 243, ${0.3})`,
-                borderWidth: 1,
-                pointRadius: 0,
-                tension: 0.1
-            }))
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: {
-                    title: { display: true, text: 'Time Steps' }
-                },
-                y: {
-                    title: { display: true, text: 'Asset Price' },
-                    beginAtZero: false
-                }
-            },
-            plugins: {
-                legend: { display: false }
-            }
-        }
-    });
+    const layout = {
+        title: 'Monte Carlo Simulation Paths',
+        xaxis: {title: 'Time'},
+        yaxis: {title: 'Asset Price'},
+        showlegend: false
+    };
+
+    Plotly.newPlot('pathsPlot', traces, layout);
+}
+
+function plotHistogram(paths) {
+    const finalPrices = paths.map(path => path[path.length - 1]);
+    
+    const trace = {
+        x: finalPrices,
+        type: 'histogram',
+        marker: {color: '#4CAF50'},
+        opacity: 0.7
+    };
+
+    const layout = {
+        title: 'Final Price Distribution',
+        xaxis: {title: 'Price'},
+        yaxis: {title: 'Frequency'}
+    };
+
+    Plotly.newPlot('histogram', [trace], layout);
 }
 
 // Box-Muller transform for normal random numbers
@@ -93,3 +88,16 @@ function randn_bm() {
     while(v === 0) v = Math.random();
     return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
 }
+
+// Add event listeners for real-time updates
+document.querySelectorAll('input').forEach(input => {
+    input.addEventListener('input', function() {
+        if(this.type === 'range') {
+            document.getElementById(this.id + 'Value').textContent = this.value;
+        }
+        runSimulation();
+    });
+});
+
+// Initial run
+runSimulation();
