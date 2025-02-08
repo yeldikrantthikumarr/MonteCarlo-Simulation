@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monte Carlo VaR Calculator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Monte Carlo VaR Calculator</h1>
+    <form id="var-form">
+      <label for="portfolio-value">Portfolio Value ($):</label>
+      <input type="number" id="portfolio-value" required>
+
+      <label for="volatility">Volatility (%):</label>
+      <input type="number" id="volatility" required>
+
+      <label for="time-horizon">Time Horizon (days):</label>
+      <input type="number" id="time-horizon" required>
+
+      <label for="confidence-level">Confidence Level (%):</label>
+      <input type="number" id="confidence-level" required>
+
+      <button type="submit">Calculate VaR</button>
+    </form>
+
+    <div id="result">
+      <h2>Result:</h2>
+      <p id="var-output"></p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
