@@ -3,59 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monte Carlo Path Visualizer</title>
+    <title>Monte Carlo Path Visualiser</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
     <div class="container">
-        <!-- Left Panel: Controls -->
-        <div class="controls-panel">
-            <h1>Monte Carlo Path Visualizer</h1>
-            
-            <div class="model-selector">
-                <button class="model-btn active" data-model="bs">Black-Scholes</button>
-                <button class="model-btn" data-model="heston">Heston</button>
+        <div class="controls">
+            <h2>Simulation Parameters</h2>
+            <div class="form-group">
+                <label>Initial Price (S₀):</label>
+                <input type="number" id="S0" value="100" step="1">
             </div>
-
-            <div class="input-group">
-                <label>Initial Asset Price (S₀)</label>
-                <input type="number" id="S0" value="100" step="0.1">
-            </div>
-
-            <div class="input-group">
-                <label>Expected Return (μ)</label>
+            <div class="form-group">
+                <label>Expected Return (μ):</label>
                 <input type="number" id="mu" value="0.05" step="0.01">
             </div>
-
-            <div class="input-group">
-                <label>Volatility (σ)</label>
+            <div class="form-group">
+                <label>Volatility (σ):</label>
                 <input type="number" id="sigma" value="0.2" step="0.01">
             </div>
-
-            <div class="input-group">
-                <label>Time Steps</label>
-                <input type="number" id="steps" value="252" min="1">
+            <div class="form-group">
+                <label>Time Steps:</label>
+                <input type="range" id="timeSteps" min="10" max="365" value="100">
+                <span id="timeStepsValue">100</span>
             </div>
-
-            <div class="input-group">
-                <label>Max Paths</label>
-                <input type="number" id="max-paths" value="100" min="1">
+            <div class="form-group">
+                <label>Number of Paths:</label>
+                <input type="range" id="numPaths" min="10" max="250" value="50">
+                <span id="numPathsValue">50</span>
             </div>
-
-            <div class="input-group">
-                <label>
-                    <input type="checkbox" id="log-process"> Use Log Spot Process
-                </label>
+            <div class="form-group">
+                <label><input type="checkbox" id="logProcess"> Use log spot process</label>
             </div>
-
-            <button id="simulate-btn">Simulate Paths</button>
+            <button onclick="runSimulation()">Run Simulation</button>
         </div>
 
-        <!-- Right Panel: Visualization -->
-        <div class="visualization-panel">
-            <canvas id="pathChart"></canvas>
+        <div class="visualization">
+            <div id="pathsPlot"></div>
+            <div id="histogram"></div>
         </div>
+    </div>
+
+    <div class="description">
+        <!-- Your provided description text goes here -->
+        <!-- [Include all the description text you provided] -->
     </div>
 
     <script src="script.js"></script>
