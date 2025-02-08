@@ -1,36 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Monte Carlo VaR Calculator</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monte Carlo Path Visualizer</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div class="container">
-    <h1>Monte Carlo VaR Calculator</h1>
-    <form id="var-form">
-      <label for="portfolio-value">Portfolio Value ($):</label>
-      <input type="number" id="portfolio-value" required>
+    <div class="container">
+        <!-- Left Panel: Controls -->
+        <div class="controls-panel">
+            <h1>Monte Carlo Path Visualizer</h1>
+            
+            <div class="model-selector">
+                <button class="model-btn active" data-model="bs">Black-Scholes</button>
+                <button class="model-btn" data-model="heston">Heston</button>
+            </div>
 
-      <label for="volatility">Volatility (%):</label>
-      <input type="number" id="volatility" required>
+            <div class="input-group">
+                <label>Initial Asset Price (S₀)</label>
+                <input type="number" id="S0" value="100" step="0.1">
+            </div>
 
-      <label for="time-horizon">Time Horizon (days):</label>
-      <input type="number" id="time-horizon" required>
+            <div class="input-group">
+                <label>Expected Return (μ)</label>
+                <input type="number" id="mu" value="0.05" step="0.01">
+            </div>
 
-      <label for="confidence-level">Confidence Level (%):</label>
-      <input type="number" id="confidence-level" required>
+            <div class="input-group">
+                <label>Volatility (σ)</label>
+                <input type="number" id="sigma" value="0.2" step="0.01">
+            </div>
 
-      <button type="submit">Calculate VaR</button>
-    </form>
+            <div class="input-group">
+                <label>Time Steps</label>
+                <input type="number" id="steps" value="252" min="1">
+            </div>
 
-    <div id="result">
-      <h2>Result:</h2>
-      <p id="var-output"></p>
+            <div class="input-group">
+                <label>Max Paths</label>
+                <input type="number" id="max-paths" value="100" min="1">
+            </div>
+
+            <div class="input-group">
+                <label>
+                    <input type="checkbox" id="log-process"> Use Log Spot Process
+                </label>
+            </div>
+
+            <button id="simulate-btn">Simulate Paths</button>
+        </div>
+
+        <!-- Right Panel: Visualization -->
+        <div class="visualization-panel">
+            <canvas id="pathChart"></canvas>
+        </div>
     </div>
-  </div>
 
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
